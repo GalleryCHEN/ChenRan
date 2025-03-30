@@ -1,3 +1,23 @@
 mkdir link-parser-api
 cd link-parser-api
 mkdir api  
+from flask import Flask, request, jsonify
+import requests
+import os
+
+app = Flask(__name__)
+
+@app.route('/parse', methods=['GET'])
+def parse_link():
+    url = request.args.get('url')
+    api_key = os.environ.get('LINKPREVIEW_KEY')  # 从环境变量读取密钥
+    response = requests.get(f"https://api.linkpreview.net?q={url}&key={api_key}")
+    data = response.json()
+    return jsonify({
+        "title": data.get("title"),
+        "description": data.get("description"),
+        "image": data.get("image")
+    })
+
+if __name__ == "__main__":
+    app.run()
